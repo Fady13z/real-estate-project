@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
-import api from './../../api/axiosConfig';
+import api from "./../../api/axiosConfig";
 
 const Login = () => {
     const [data, setData] = useState({
@@ -18,13 +18,14 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const url = "http://localhost:4000/api/users/login";
+            const url = "https://confident-serenity.up.railway.app/api/users/login";
             const { data: res } = await api.post(url, data);
-            
+
+            // حفظ التوكن وتحديث الهيدر
             localStorage.setItem("token", res.token);
-            
             api.defaults.headers.common['Authorization'] = `Bearer ${res.token}`;
-            
+
+            // التوجيه حسب الدور
             if (res.user.role === "employee") {
                 navigate("/employeeDash");
             } else if (res.user.role === "moderator") {
@@ -44,7 +45,7 @@ const Login = () => {
     return (
         <div className={styles.login_container}>
             <div className={styles.login_form_container}>
-                <h1 className={styles.login_title}>سجل الدخول الان</h1>
+                <h1 className={styles.login_title}>سجل الدخول الآن</h1>
                 <form onSubmit={handleSubmit}>
                     <label className={styles.label}>البريد الإلكتروني</label>
                     <input

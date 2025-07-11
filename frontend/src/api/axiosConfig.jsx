@@ -1,14 +1,12 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:4000/api',
-  timeout: 15000, // 15 seconds timeout
+  baseURL: 'https://confident-serenity.up.railway.app/api', // 🔁 تم التعديل هنا
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json'
   }
 });
-
-
 
 api.interceptors.request.use(
   (config) => {
@@ -28,9 +26,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-
-
-// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -48,14 +43,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-api.interceptors.response.use(
-    response => response,
-    error => {
-      if (error.code === 'ECONNABORTED') {
-        console.error('Timeout error: Server took too long to respond');
-      }
-      return Promise.reject(error);
-    });
 
 export default api;
