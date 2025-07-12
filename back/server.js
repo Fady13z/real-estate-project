@@ -16,6 +16,11 @@ const port = process.env.PORT || 4000;
 app.use(express.json());
 app.use(cors());
 
+// ✅ Route رئيسي للتأكد إن السيرفر شغال
+app.get('/', (req, res) => {
+  res.send('✅ Real Estate API is running.');
+});
+
 // ✅ Connect to MongoDB using URI from .env
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
@@ -43,5 +48,5 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(port, () => {
-  console.log(`🚀 Server is running on http://localhost:${port}`);
+  console.log(`🚀 Server is running on port ${port}`);
 });
