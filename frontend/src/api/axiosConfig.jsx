@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://confident-serenity.up.railway.app/api', // 🔁 تم التعديل هنا
+  baseURL: "https://confident-serenity.up.railway.app/api"
+, // 🔁 تم التعديل هنا
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json'
