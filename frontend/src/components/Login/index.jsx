@@ -18,8 +18,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const url = "https://confident-serenity.up.railway.app/api/users/login";
-            const { data: res } = await api.post(url, data);
+            const { data: res } = await api.post("/users/login", data);
 
             // حفظ التوكن وتحديث الهيدر
             localStorage.setItem("token", res.token);

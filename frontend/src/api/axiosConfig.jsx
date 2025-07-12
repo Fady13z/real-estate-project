@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "https://confident-serenity.up.railway.app/api"
+  baseURL: "https://real-estate-project-production-b5a8.up.railway.app"
 , // 🔁 تم التعديل هنا
   timeout: 15000,
   headers: {

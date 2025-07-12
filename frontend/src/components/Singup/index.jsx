@@ -1,7 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
+import api from "./../../api/axiosConfig";
 
 const Signup = () => {
     const [data, setData] = useState({
@@ -20,8 +20,7 @@ const Signup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const url = "https://confident-serenity.up.railway.app/api/users/register";
-            const { data: res } = await axios.post(url, data);
+            const { data: res } = await api.post("/users/register", data);
             navigate("/");
             console.log(res);
         } catch (error) {
@@ -30,7 +29,9 @@ const Signup = () => {
                 error.response.status >= 400 &&
                 error.response.status <= 500
             ) {
-                setError(error.response.data.message);
+                setError(error.response.data.message || "حدث خطأ أثناء التسجيل");
+            } else {
+                setError("خطأ في الشبكة. حاول مرة أخرى.");
             }
         }
     };
