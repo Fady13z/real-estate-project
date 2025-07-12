@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "https://real-estate-project-production-b5a8.up.railway.app"
-, // 🔁 تم التعديل هنا
+  baseURL: "https://real-estate-project-production-b5a8.up.railway.app/api", // ✅ صححنا المسار
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json'
@@ -13,7 +12,7 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `${token}`;
+      config.headers.Authorization = `Bearer ${token}`; // ✅ أضفنا Bearer
       delete config.headers.token;
     }
 
@@ -31,7 +30,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.code === 'ECONNABORTED') {
-      console.error('Timeout error: Server took too long to respond');
+      console.error('⏱️ Timeout error: Server took too long to respond');
     }
 
     if (error.response?.status === 401) {

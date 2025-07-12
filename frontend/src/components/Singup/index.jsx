@@ -21,9 +21,10 @@ const Signup = () => {
         e.preventDefault();
         try {
             const { data: res } = await api.post("/users/register", data);
+            console.log("📥 Response from register:", res);
             navigate("/");
-            console.log(res);
         } catch (error) {
+            console.error("❌ Registration error:", error);
             if (
                 error.response &&
                 error.response.status >= 400 &&
