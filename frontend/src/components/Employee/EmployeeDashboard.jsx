@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api, { BASE_URL } from "../../api/axiosConfig";
 import styles from "./styles.module.css";
 import { useNavigate } from "react-router-dom";
-import logo from '../../WhatsApp_Image_2025-07-07_at_03.47.17_5195f6a4-removebg-preview.png'; // Make sure this path is correct
+import logo from '../../WhatsApp_Image_2025-07-07_at_03.47.17_5195f6a4-removebg-preview.png';
 
 const EmployeeDashboard = () => {
   const [properties, setProperties] = useState([]);
@@ -15,9 +15,7 @@ const EmployeeDashboard = () => {
     const fetchProperties = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:4000/api/properties", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await api.get("/api/properties");
         setProperties(response.data.data);
         setIsLoading(false);
       } catch (err) {
@@ -34,10 +32,7 @@ const EmployeeDashboard = () => {
     e.preventDefault();
     if (!searchTerm.trim()) {
       try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:4000/api/properties", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await api.get("/api/properties");
         setProperties(response.data.data);
       } catch (err) {
         setError("فشل في تحميل البيانات");
@@ -47,11 +42,7 @@ const EmployeeDashboard = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `http://localhost:4000/api/properties?address=${encodeURIComponent(searchTerm)}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await api.get(`/api/properties?address=${encodeURIComponent(searchTerm)}`);
       setProperties(response.data.data);
     } catch (err) {
       setError("فشل في البحث. يرجى المحاولة مرة أخرى");
@@ -62,7 +53,6 @@ const EmployeeDashboard = () => {
   return (
     <div className={styles.dashboard_wrapper}>
       <div className={styles.dashboard_container} dir="rtl">
-        {/* Logo Header Section */}
         <div className={styles.logo_header}>
           <img src={logo} alt="Company Logo" className={styles.logo} />
           <div className={styles.company_info}>
@@ -73,7 +63,7 @@ const EmployeeDashboard = () => {
 
         <div className={styles.content_wrapper}>
           <h1 className={styles.dashboard_title}>لوحة تحكم الموظف - إدارة العقارات</h1>
-          
+
           <form onSubmit={handleSearch} className={styles.search_form}>
             <input
               type="text"
@@ -82,9 +72,7 @@ const EmployeeDashboard = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className={styles.search_input}
             />
-            <button type="submit" className={styles.search_btn}>
-              بحث
-            </button>
+            <button type="submit" className={styles.search_btn}>بحث</button>
           </form>
 
           {error && <div className={styles.error_msg}>{error}</div>}
@@ -102,9 +90,7 @@ const EmployeeDashboard = () => {
                       <h3>
                         {property.unitType} - {property.address}
                       </h3>
-                      <span
-                        className={`${styles.status} ${styles[property.status.replace(" ", "_")]}`}
-                      >
+                      <span className={`${styles.status} ${styles[property.status.replace(" ", "_")]}`}>
                         {property.status}
                       </span>
                     </div>
@@ -142,41 +128,38 @@ const EmployeeDashboard = () => {
                           <span>{property.anotherInfo}</span>
                         </div>
                       )}
-{property.ContractImage && (
-  <div className={styles.detail_item}>
-    <span className={styles.detail_label}>ملف العقد:</span>
-    <div className={styles.image_preview_container}>
-      {(() => {
-        const imageUrl = `http://localhost:4000/uploads/${property.ContractImage.split('/').pop()}`;
-        console.log('Trying to load contract image from:', imageUrl);
-        
-        if (property.ContractImage.match(/\.(jpeg|jpg|png|webp)$/i)) {
-          return (
-            <img 
-              src={imageUrl}
-              alt="عقد العقار"
-              className={styles.contract_image}
-              onError={(e) => {
-                console.error('Failed to load contract image:', imageUrl);
-                e.target.onerror = null;
-                e.target.src = '/images/document-placeholder.png';
-              }}
-            />
-          );
-        } else {
-          return (
-            <div className={styles.document_preview}>
-              <span className={styles.document_icon}>📄</span>
-              <span className={styles.document_text}>
-                {property.ContractImage.split('/').pop()}
-              </span>
-            </div>
-          );
-        }
-      })()}
-    </div>
-  </div>
-)}
+                      {property.ContractImage && (
+                        <div className={styles.detail_item}>
+                          <span className={styles.detail_label}>ملف العقد:</span>
+                          <div className={styles.image_preview_container}>
+                            {(() => {
+                              const imageUrl = `${BASE_URL}/uploads/${property.ContractImage.split('/').pop()}`;
+                              if (property.ContractImage.match(/\.(jpeg|jpg|png|webp)$/i)) {
+                                return (
+                                  <img 
+                                    src={imageUrl}
+                                    alt="عقد العقار"
+                                    className={styles.contract_image}
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = '/images/document-placeholder.png';
+                                    }}
+                                  />
+                                );
+                              } else {
+                                return (
+                                  <div className={styles.document_preview}>
+                                    <span className={styles.document_icon}>📄</span>
+                                    <span className={styles.document_text}>
+                                      {property.ContractImage.split('/').pop()}
+                                    </span>
+                                  </div>
+                                );
+                              }
+                            })()}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))

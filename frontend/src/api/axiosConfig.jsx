@@ -43,5 +43,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+export const BASE_URL = "https://real-estate-project-production-b5a8.up.railway.app";
 
 export default api;

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../api/axiosConfig";
 import styles from "./styles.module.css";
+import { BASE_URL } from "../../api/axiosConfig";
 import logo from '../../WhatsApp_Image_2025-07-07_at_03.47.17_5195f6a4-removebg-preview.png'
 const ModeratorDashboard = () => {
   const [properties, setProperties] = useState([]);
@@ -27,80 +28,58 @@ const ModeratorDashboard = () => {
   });
 
   useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:4000/api/properties", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        console.log(response);
-        
-        setProperties(response.data.data);
-        setIsLoading(false);
-      } catch (err) {
-        setError("فشل في تحميل البيانات. يرجى المحاولة مرة أخرى");
-        setIsLoading(false);
-        console.error("Error fetching properties:", err);
-      }
-    };
-
-    fetchProperties();
-  }, []);
-
-  const handleDeleteProperty = async (id) => {
-    if (!window.confirm("هل أنت متأكد من حذف هذا العقار؟")) {
-      return;
-    }
-
+  const fetchProperties = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(
-        `http://localhost:4000/api/properties/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+      const response = await api.get("/api/properties");
+      console.log(response);
 
-      setProperties(properties.filter(property => property._id !== id));
+      setProperties(response.data.data);
+      setIsLoading(false);
     } catch (err) {
-      setError("فشل في حذف العقار. يرجى المحاولة مرة أخرى");
-      console.error("Delete property error:", err);
+      setError("فشل في تحميل البيانات. يرجى المحاولة مرة أخرى");
+      setIsLoading(false);
+      console.error("Error fetching properties:", err);
     }
   };
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchTerm.trim()) {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:4000/api/properties", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setProperties(response.data.data);
-      } catch (err) {
-        setError("فشل في تحميل البيانات");
-        console.error("Error:", err);
-      }
-      return;
-    }
+  fetchProperties();
+}, []);
 
+  const handleDeleteProperty = async (id) => {
+  if (!window.confirm("هل أنت متأكد من حذف هذا العقار؟")) {
+    return;
+  }
+
+  try {
+    await api.delete(`/api/properties/${id}`);
+
+    setProperties(properties.filter(property => property._id !== id));
+  } catch (err) {
+    setError("فشل في حذف العقار. يرجى المحاولة مرة أخرى");
+    console.error("Delete property error:", err);
+  }
+};
+
+ const handleSearch = async (e) => {
+  e.preventDefault();
+  if (!searchTerm.trim()) {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `http://localhost:4000/api/properties?address=${encodeURIComponent(searchTerm)}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await api.get("/api/properties");
       setProperties(response.data.data);
     } catch (err) {
-      setError("فشل في البحث. يرجى المحاولة مرة أخرى");
-      console.error("Search error:", err);
+      setError("فشل في تحميل البيانات");
+      console.error("Error:", err);
     }
+    return;
+  }
+
+   try {
+  const response = await api.get(`/api/properties?address=${encodeURIComponent(searchTerm)}`);
+  setProperties(response.data.data);
+} catch (err) {
+  setError("فشل في البحث. يرجى المحاولة مرة أخرى");
+  console.error("Search error:", err);
+}
   };
 
   const handleInputChange = (e) => {
@@ -173,17 +152,12 @@ const handleFileChange = (e) => {
         formDataToSend.append('ContractImage', formData.ContractImage);
       }
 
-      const response = await axios.post(
-        "http://localhost:4000/api/properties",
-        formDataToSend,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          },
-          timeout: 10000
-        }
-      );
+     const response = await api.post("/api/properties", formDataToSend, {
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  },
+  timeout: 10000
+});
 
       setProperties([response.data.data, ...properties]);
       setShowAddForm(false);
@@ -232,17 +206,16 @@ const handleFileChange = (e) => {
         formDataToSend.append('ContractImage', formData.ContractImage);
       }
 
-      const response = await axios.put(
-        `http://localhost:4000/api/properties/${editingProperty._id}`,
-        formDataToSend,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          },
-          timeout: 10000
-        }
-      );
+      const response = await api.put(
+  `/api/properties/${editingProperty._id}`,
+      formDataToSend,
+  {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    timeout: 10000
+  });
+
 
       setProperties(properties.map(p => 
         p._id === editingProperty._id ? response.data.data : p
@@ -665,7 +638,7 @@ const handleFileChange = (e) => {
     <div className={styles.image_preview_container}>
       {property.ContractImage.toLowerCase().endsWith('.pdf') ? (
         <a
-          href={`http://localhost:4000/uploads/${property.ContractImage.split('/').pop()}`}
+          href={`${BASE_URL}/uploads/${property.ContractImage.split('/').pop()}`}
           target="_blank"
           rel="noopener noreferrer"
           className={styles.contract_link}
@@ -674,7 +647,7 @@ const handleFileChange = (e) => {
         </a>
       ) : (
         <img 
-          src={`http://localhost:4000/uploads/${property.ContractImage.split('/').pop()}`} 
+          src={`${BASE_URL}/uploads/${property.ContractImage.split('/').pop()}`} 
           alt="عقد العقار" 
           className={styles.contract_image}
           onError={(e) => {
@@ -687,6 +660,7 @@ const handleFileChange = (e) => {
     </div>
   </div>
 )}
+
                   </div>
 
                   <div className={styles.property_actions}>
