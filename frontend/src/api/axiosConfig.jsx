@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "https://real-estate-project-production-b5a8.up.railway.app/api", // ✅ صححنا المسار
+  baseURL: "https://real-estate-project-production-b5a8.up.railway.app", // ✅ صححنا المسار
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json'
