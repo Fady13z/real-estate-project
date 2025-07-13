@@ -20,7 +20,7 @@ const Signup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { data: res } = await api.post("/users/register", data);
+            const { data: res } = await api.post("/api/users/register", data);
             console.log("📥 Response from register:", res);
             navigate("/");
         } catch (error) {
